@@ -1,12 +1,14 @@
-FROM python:3.10
+FROM python:3.8-slim-buster
 
 WORKDIR /app
 
-COPY requirements.txt .
-
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install uwsgi
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
 
 COPY . .
 
-CMD ["python", "bot.py"]
+RUN cd google-images-download && python3 setup.py install
+RUN mkdir downloads
+RUN apt-get update && apt-get install -y ffmpeg
+
+CMD [ "python3", "main.py"]
