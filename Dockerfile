@@ -1,30 +1,12 @@
-FROM python:3.8
+FROM python:3.10
 
-ENV PYTHONUNBUFFERED 1
-ENV APP_ROOT /code
+WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-  locales \
-  locales-all \
-  build-essential \
-  libpq-dev \
-  libjpeg-dev \
-  binutils \
-  libproj-dev \
-  gdal-bin \
-  libxml2-dev \
-  libxslt1-dev \
-  zlib1g-dev \
-  libffi-dev \
-  wkhtmltopdf \
-  libssl-dev
+COPY requirements.txt .
 
-COPY mime.types /etc/mime.types
-
-RUN mkdir ${APP_ROOT}
-COPY . ${APP_ROOT}
-WORKDIR ${APP_ROOT}
-
-RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
-#RUN python manage.py collectstatic --noinput
+RUN pip install uwsgi
+
+COPY . .
+
+CMD ["python", "bot.py"]
