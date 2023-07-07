@@ -3,6 +3,8 @@ import os
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
+import youtube_dl
+
 load_dotenv()
 
 token = os.getenv('TOKEN')
@@ -24,5 +26,30 @@ async def on_member_join(member):
     if channel:
         message = f"{member.mention} xoş gəldin! Qmeterə qatıldığın üçün təşəkkür edirik."
         await channel.send(message)
+
+
+@bot.command()
+async def play(ctx, url):
+    voice_channel = ctx.message.author.voice.channel
+    if voice_channel is None:
+        await ctx.send("Önce bir sesli kanala katılmanız gerekiyor.")
+        return
+    voice_channel = await voice_channel.connect()
+
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '192',
+        }],
+    }
+
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=False)
+        url2 = info['formats'][0]['url']
+        voice_channel.play(discord.FFmpegPCMAudio(url2))
+
+
 
 bot.run(token)  
