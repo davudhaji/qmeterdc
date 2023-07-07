@@ -29,6 +29,12 @@ async def on_member_join(member):
 
 
 @bot.command()
+async def test(ctx, arg):
+    await ctx.send(arg)
+
+
+
+@bot.command()
 async def play(ctx, url):
     voice_channel = ctx.message.author.voice.channel
     if voice_channel is None:
